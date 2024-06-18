@@ -13,6 +13,7 @@ export class SearchPage implements OnInit {
   };
   allRestaurants: any[] = [
     {
+      uid: '12wefdss',
       cover: 'assets/imgs/1.jpg',
       name: 'Stayfit',
       short_name: 'stayfit',
@@ -22,10 +23,10 @@ export class SearchPage implements OnInit {
       ],
       rating: 5,
       delivery_time: 25,
-      // distance: 2.5,
       price: 100
     },
     {
+      uid: '12wefsdsdss',
       cover: 'assets/imgs/2.jpg',
       name: 'Stayfit1',
       short_name: 'stayfit1',
@@ -35,10 +36,10 @@ export class SearchPage implements OnInit {
       ],
       rating: 5,
       delivery_time: 25,
-      // distance: 2.5,
       price: 100
     },
     {
+      uid: '12wefsdsdsgbs',
       cover: 'assets/imgs/3.jpg',
       name: 'Stayfit3',
       short_name: 'stayfit3',
@@ -48,7 +49,6 @@ export class SearchPage implements OnInit {
       ],
       rating: 5,
       delivery_time: 25,
-      // distance: 2.5,
       price: 100
     }
   ];
@@ -67,20 +67,20 @@ export class SearchPage implements OnInit {
     this.query = event.detail.value.toLowerCase();
     this.isLoading = true; // Set isLoading to true before filtering starts
     this.restaurants = []; // Clear previous search results
-    
+
     if (this.query.length > 0) {
       setTimeout(() => {
         // Simulating an asynchronous operation with setTimeout
         this.restaurants = this.allRestaurants.filter((element) => {
           return element.short_name.includes(this.query);
         });
-        
+
         this.isLoading = false; // Set isLoading to false after filtering is complete
       }, 3000); // Simulated delay of 3 seconds
     } else {
       this.isLoading = false; // If query is empty, set isLoading to false immediately
     }
   }
-  
+
 
 }
