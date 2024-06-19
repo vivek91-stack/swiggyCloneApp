@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Preferences } from '@capacitor/preferences';
 import { NavController } from '@ionic/angular';
 
 @Component({
@@ -58,6 +59,8 @@ export class ItemsPage implements OnInit {
   id: any;
   data: any = {};
   items: any[] = [];
+  cartData: any = {};
+  storeData: any = {};
   categories: any[] = [
     {
       id: "e00",
@@ -69,7 +72,7 @@ export class ItemsPage implements OnInit {
       name: "Mexican",
       uid: "12wefdss"
     },
-  ]; 
+  ];
 
   allItems = [
     {
@@ -115,7 +118,8 @@ export class ItemsPage implements OnInit {
   veg: boolean = false;
   constructor(
     private navCtrl: NavController,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) { }
 
   ngOnInit() {
@@ -131,10 +135,31 @@ export class ItemsPage implements OnInit {
     })
   }
 
-  getItems() {
+  getCart() {
+    return Preferences.get({key: 'cart'})
+  }
+
+  async getItems() {
     this.data = {};
+    this.cartData = {};
+    this.storeData = {};
     this.data = this.restaurants.find(x => x.uid === this.id);
-    this.items = this.allItems;
+    this.categories = this.categories.filter(x => x.uid === this.id);
+    this.items = this.allItems.filter(x => x.uid === this.id);
+    let cart: any = await this.getCart();
+    if(cart?.value) {
+      this.storeData = JSON.parse(cart.value);
+      if(this.id == this.storeData.restaurant.uid && this.allItems.length > 0) {
+        this.allItems.forEach(element => {
+          this.storeData.items.forEach(ele => {
+            if(element.id != ele.id) return;
+            element['quantity'] = ele.quantity
+          });
+        });
+      }
+      this.cartData.totalItem = this.storeData.totalItem;
+      this.cartData.totalPrice = this.storeData.totalPrice;
+    }
   }
 
   getCuisine(cuisine) {
@@ -142,7 +167,70 @@ export class ItemsPage implements OnInit {
   }
 
   vegOnly(event) {
-    
+    this.items = [];
+    if(event.detail.checked == true) {
+      this.items = this.allItems.filter(x => x.veg === true);
+    } else {
+      this.items = this.allItems;
+    }
+  }
+
+  quantityPlus(item, index) {
+    try {
+      if(!this.items[index].quantity || this.items[index].quantity == 0 ) {
+        this.items[index].quantity = 1;
+        this.calculate();
+      } else {
+        this.items[index].quantity += 1;
+        this.calculate();
+      }
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  quantityMinus(item, index) {
+    if(this.items[index].quantity !== 0)  {
+      this.items[index].quantity -= 1;
+    } else {
+      this.items[index].quantity = 0;
+    }
+    this.calculate();
+  }
+
+  calculate() {
+    this.cartData.items = [];
+    let item = this.items.filter(x => x.quantity > 0);
+    this.cartData.items = item;
+    this.cartData.totalPrice = 0;
+    this.cartData.totalItem = 0;
+    item.forEach(element => {
+      this.cartData.totalItem += element.quantity;
+      this.cartData.totalPrice += (parseFloat(element.price) * parseFloat(element.quantity));
+    });
+    this.cartData.totalPrice = parseFloat(this.cartData.totalPrice).toFixed(2)
+    if (this.cartData.totalItem == 0) {
+      this.cartData.totalItem = 0;
+      this.cartData.totalPrice = 0;
+    }
+  }
+
+  async viewCart() {
+    if(this.cartData?.items && this.cartData.items.length > 0) await this.saveToCart();
+    this.router.navigate([this.router.url + '/cart']);
+  }
+
+  async saveToCart() {
+    try {
+      this.cartData.restaurant = {};
+      this.cartData.restaurant = this.data;
+      await Preferences.set({
+        key: 'cart',
+        value: JSON.stringify(this.cartData)
+      });
+    } catch (error) {
+      console.log(error)
+    }
   }
 
 }
