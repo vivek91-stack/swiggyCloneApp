@@ -57,8 +57,62 @@ export class ItemsPage implements OnInit {
   ];
   id: any;
   data: any = {};
-  items: any = [];
-  categories: any = [];
+  items: any[] = [];
+  categories: any[] = [
+    {
+      id: "e00",
+      name: "Italian",
+      uid: "12wefdss"
+    },
+    {
+      id: "e0",
+      name: "Mexican",
+      uid: "12wefdss"
+    },
+  ]; 
+
+  allItems = [
+    {
+        category_id: "e00",
+        cover: "assets/imgs/pizza.jpg",
+        desc: "Great in taste",
+        id: "i1",
+        name: "Pizza",
+        price: 120,
+        rating: 0,
+        status: true,
+        uid: "12wefdss",
+        variation: false,
+        veg: false
+    },
+    {
+        category_id: "e0",
+        cover: "assets/imgs/salad.jpg",
+        desc: "Great in taste",
+        id: "i2",
+        name: "Caprese Salad",
+        price: 200,
+        rating: 0,
+        status: true,
+        uid: "12wefdss",
+        variation: false,
+        veg: true
+    },
+    {
+        category_id: "e00",
+        cover: "assets/imgs/pasta.jpg",
+        desc: "Great in taste",
+        id: "i3",
+        name: "Pasta",
+        price: 150.50,
+        rating: 0,
+        status: true,
+        uid: "12wefdss",
+        variation: false,
+        veg: false
+    },
+  ];
+  veg: boolean = false;
   constructor(
     private navCtrl: NavController,
     private route: ActivatedRoute
@@ -79,11 +133,16 @@ export class ItemsPage implements OnInit {
 
   getItems() {
     this.data = {};
-    this.data = this.restaurants.find(x => x.uid === this.id)
+    this.data = this.restaurants.find(x => x.uid === this.id);
+    this.items = this.allItems;
   }
 
   getCuisine(cuisine) {
     return cuisine.join(', ');
+  }
+
+  vegOnly(event) {
+    
   }
 
 }

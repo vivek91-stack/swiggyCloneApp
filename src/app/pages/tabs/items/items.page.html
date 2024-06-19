@@ -9,7 +9,7 @@
 
 <ion-content [fullscreen]="true">
   <ion-grid *ngIf="data?.name" class="borderBottom">
-    <ion-row class="ion-padding-horizontal" class="dashedBorderBottom">
+    <ion-row class="ion-padding-horizontal dashedBorderBottom">
       <ion-label>
         <h1>{{ data?.name }}</h1>
         <ion-text *ngIf="data?.cuisines"><p>{{ getCuisine(data?.cuisines) }}</p></ion-text>
@@ -51,4 +51,34 @@
       </ion-col>
     </ion-row>
   </ion-grid>
+
+  <ion-row class="ion-padding veg borderBottomSmall">
+    <ion-label class="">
+      <h4>VEG ONLY</h4>
+    </ion-label>
+    <ion-toggle mode="md" color="success" (ionChange)="vegOnly($event)" [(ngModel)]="veg"></ion-toggle>
+  </ion-row>
+
+  <ion-list lines="none" *ngFor="let category of categories">
+    <ion-list-header>
+      {{ category?.name }}
+    </ion-list-header>
+    <ng-container *ngFor="let item of items; let i = index">
+      <ion-item *ngIf="category.id === item.category_id">
+        <ion-thumbnail>
+          <img [src]="item?.cover ? item?.cover : 'assets/imgs/1.jpg'" >
+        </ion-thumbnail>
+        <ion-label>
+          <h4>{{ item?.name }}</h4>
+          <p class="ion-text-wrap">{{ item?.desc }}</p>
+          <ion-text>
+            <p>{{ item?.price }}</p>
+          </ion-text>
+        </ion-label>
+        <ion-row>
+          <ion-text class="ion-padding-horizontal">Add</ion-text>
+        </ion-row>
+      </ion-item>
+    </ng-container>
+  </ion-list>
 </ion-content>
