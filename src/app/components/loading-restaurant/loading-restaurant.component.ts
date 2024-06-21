@@ -5,8 +5,10 @@ import { Component, OnInit } from '@angular/core';
   templateUrl: './loading-restaurant.component.html',
   styleUrls: ['./loading-restaurant.component.scss'],
 })
-export class LoadingRestaurantComponent  implements OnInit {
+export class LoadingRestaurantComponent implements OnInit {
+  
   dummy = Array(10);
+
   constructor() { }
 
   ngOnInit() {}

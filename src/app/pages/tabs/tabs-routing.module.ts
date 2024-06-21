@@ -13,12 +13,12 @@ const routes: Routes = [
         loadChildren: () => import('./home/home.module').then( m => m.HomePageModule)
       },
       {
-        path: 'search',
-        loadChildren: () => import('./search/search.module').then( m => m.SearchPageModule)
-      },
-      {
         path: 'cart',
         loadChildren: () => import('./cart/cart.module').then( m => m.CartPageModule)
+      },
+      {
+        path: 'search',
+        loadChildren: () => import('./search/search.module').then( m => m.SearchPageModule)
       },
       {
         path: 'account',
@@ -28,13 +28,18 @@ const routes: Routes = [
         path: '',
         redirectTo: '/tabs/home',
         pathMatch: 'full'
-      },
+      }
     ]
   },
   {
     path: 'restaurants/:restaurantId',
     loadChildren: () => import('./items/items.module').then( m => m.ItemsPageModule)
   },
+  {
+    path: 'address',
+    loadChildren: () => import('./address/address.module').then( m => m.AddressPageModule)
+  },
+  
 ];
 
 @NgModule({

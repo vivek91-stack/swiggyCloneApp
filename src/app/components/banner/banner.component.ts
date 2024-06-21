@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { IonicSlides } from '@ionic/angular/standalone';
+import { IonicSlides } from '@ionic/angular';
 
 @Component({
   selector: 'app-banner',
@@ -7,6 +7,7 @@ import { IonicSlides } from '@ionic/angular/standalone';
   styleUrls: ['./banner.component.scss'],
 })
 export class BannerComponent  implements OnInit {
+
   swiperModules = [IonicSlides];
   @Input() bannerImages: any[];
 

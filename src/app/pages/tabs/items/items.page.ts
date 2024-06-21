@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Preferences } from '@capacitor/preferences';
 import { NavController } from '@ionic/angular';
+import { Preferences } from '@capacitor/preferences';
 
 @Component({
   selector: 'app-items',
@@ -9,6 +9,18 @@ import { NavController } from '@ionic/angular';
   styleUrls: ['./items.page.scss'],
 })
 export class ItemsPage implements OnInit {
+
+  id: any;
+  data: any = {};
+  items: any[] = [];
+  veg: boolean = false;
+  isLoading: boolean;
+  cartData: any = {};
+  storedData: any = {};
+  model = {
+    icon: 'fast-food-outline',
+    title: 'No Menu Available'
+  };
   restaurants = [
     {
       uid: '12wefdss',
@@ -26,41 +38,37 @@ export class ItemsPage implements OnInit {
       price: 100
     },
     {
-      uid: '12wefsdsdss',
+      uid: '12wefdefsdss',
       cover: 'assets/imgs/2.jpg',
       name: 'Stayfit1',
       short_name: 'stayfit1',
-      address: 'Karol Bagh, New Delhi',
       cuisines: [
         'Italian',
         'Mexican'
       ],
       rating: 5,
       delivery_time: 25,
+      address: 'Karol Bagh, New Delhi',
       distance: 2.5,
       price: 100
     },
     {
-      uid: '12wefsdsdsgbs',
+      uid: '12wefdssrete',
       cover: 'assets/imgs/3.jpg',
-      name: 'Stayfit3',
-      short_name: 'stayfit3',
-      address: 'Karol Bagh, New Delhi',
+      name: 'Stayfit2',
+      short_name: 'stayfit2',
       cuisines: [
         'Italian',
         'Mexican'
       ],
       rating: 5,
       delivery_time: 25,
+      address: 'Karol Bagh, New Delhi',
       distance: 2.5,
       price: 100
-    }
+    },
   ];
-  id: any;
-  data: any = {};
-  items: any[] = [];
-  cartData: any = {};
-  storeData: any = {};
+  
   categories: any[] = [
     {
       id: "e00",
@@ -72,7 +80,7 @@ export class ItemsPage implements OnInit {
       name: "Mexican",
       uid: "12wefdss"
     },
-  ];
+  ]; 
 
   allItems = [
     {
@@ -115,7 +123,7 @@ export class ItemsPage implements OnInit {
         veg: false
     },
   ];
-  veg: boolean = false;
+
   constructor(
     private navCtrl: NavController,
     private route: ActivatedRoute,
@@ -124,74 +132,78 @@ export class ItemsPage implements OnInit {
 
   ngOnInit() {
     this.route.paramMap.subscribe(paramMap => {
-      console.log('data', paramMap);
-
+      console.log('data: ', paramMap);
       if(!paramMap.has('restaurantId')) {
         this.navCtrl.back();
         return;
       }
       this.id = paramMap.get('restaurantId');
+      console.log('id: ', this.id);
       this.getItems();
-    })
+    });
   }
 
   getCart() {
-    return Preferences.get({key: 'cart'})
+   return Preferences.get({key: 'cart'});
   }
 
   async getItems() {
+    this.isLoading = true;
     this.data = {};
     this.cartData = {};
-    this.storeData = {};
-    this.data = this.restaurants.find(x => x.uid === this.id);
-    this.categories = this.categories.filter(x => x.uid === this.id);
-    this.items = this.allItems.filter(x => x.uid === this.id);
-    let cart: any = await this.getCart();
-    if(cart?.value) {
-      this.storeData = JSON.parse(cart.value);
-      if(this.id == this.storeData.restaurant.uid && this.allItems.length > 0) {
-        this.allItems.forEach(element => {
-          this.storeData.items.forEach(ele => {
-            if(element.id != ele.id) return;
-            element['quantity'] = ele.quantity
-          });
-        });
+    this.storedData = {};
+    setTimeout(async() => {      
+      let data: any = this.restaurants.filter(x => x.uid === this.id);
+      this.data = data[0];
+      this.categories = this.categories.filter(x => x.uid === this.id);
+      this.items = this.allItems.filter(x => x.uid === this.id);
+      console.log('restaurant: ', this.data);
+      let cart: any = await this.getCart();
+      console.log('cart: ', cart);
+      if(cart?.value) {
+        this.storedData = JSON.parse(cart.value);
+        console.log('storedData: ', this.storedData);
+        if(this.id == this.storedData.restaurant.uid && this.allItems.length > 0) {
+          this.allItems.forEach((element: any) => {
+            this.storedData.items.forEach(ele => {
+              if(element.id != ele.id) return;
+              element.quantity = ele.quantity;
+            })
+          })
+        }
+        this.cartData.totalItem = this.storedData.totalItem;
+        this.cartData.totalPrice = this.storedData.totalPrice;
       }
-      this.cartData.totalItem = this.storeData.totalItem;
-      this.cartData.totalPrice = this.storeData.totalPrice;
-    }
-  }
-
-  getCuisine(cuisine) {
-    return cuisine.join(', ');
+      this.isLoading = false;
+    }, 3000);
   }
 
   vegOnly(event) {
+    console.log(event.detail.checked);
     this.items = [];
-    if(event.detail.checked == true) {
-      this.items = this.allItems.filter(x => x.veg === true);
-    } else {
-      this.items = this.allItems;
-    }
+    if(event.detail.checked == true) this.items = this.allItems.filter(x => x.veg === true);
+    else this.items = this.allItems;
+    console.log('items: ', this.items);
   }
 
-  quantityPlus(item, index) {
+  quantityPlus(index) {
     try {
-      if(!this.items[index].quantity || this.items[index].quantity == 0 ) {
+      console.log(this.items[index]);
+      if(!this.items[index].quantity || this.items[index].quantity == 0) {
         this.items[index].quantity = 1;
         this.calculate();
       } else {
-        this.items[index].quantity += 1;
+        this.items[index].quantity += 1; // this.items[index].quantity = this.items[index].quantity + 1
         this.calculate();
       }
-    } catch (e) {
-      console.log(e)
+    } catch(e) {
+      console.log(e);
     }
   }
 
-  quantityMinus(item, index) {
-    if(this.items[index].quantity !== 0)  {
-      this.items[index].quantity -= 1;
+  quantityMinus(index) {
+    if(this.items[index].quantity !== 0) {
+      this.items[index].quantity -= 1; // this.items[index].quantity = this.items[index].quantity - 1
     } else {
       this.items[index].quantity = 0;
     }
@@ -199,8 +211,10 @@ export class ItemsPage implements OnInit {
   }
 
   calculate() {
+    console.log(this.items);
     this.cartData.items = [];
     let item = this.items.filter(x => x.quantity > 0);
+    console.log('added items: ', item);
     this.cartData.items = item;
     this.cartData.totalPrice = 0;
     this.cartData.totalItem = 0;
@@ -208,29 +222,32 @@ export class ItemsPage implements OnInit {
       this.cartData.totalItem += element.quantity;
       this.cartData.totalPrice += (parseFloat(element.price) * parseFloat(element.quantity));
     });
-    this.cartData.totalPrice = parseFloat(this.cartData.totalPrice).toFixed(2)
-    if (this.cartData.totalItem == 0) {
+    this.cartData.totalPrice = parseFloat(this.cartData.totalPrice).toFixed(2);
+    if(this.cartData.totalItem == 0) {
       this.cartData.totalItem = 0;
       this.cartData.totalPrice = 0;
     }
-  }
-
-  async viewCart() {
-    if(this.cartData?.items && this.cartData.items.length > 0) await this.saveToCart();
-    this.router.navigate([this.router.url + '/cart']);
+    console.log('cart: ', this.cartData);
   }
 
   async saveToCart() {
     try {
       this.cartData.restaurant = {};
       this.cartData.restaurant = this.data;
+      console.log('cartData', this.cartData);
       await Preferences.set({
         key: 'cart',
         value: JSON.stringify(this.cartData)
       });
-    } catch (error) {
-      console.log(error)
+    } catch(e) {
+      console.log(e);
     }
+  }
+
+  async viewCart() {
+    if(this.cartData.items && this.cartData.items.length > 0) await this.saveToCart();
+    console.log('router url: ', this.router.url);
+    this.router.navigate([this.router.url + '/cart']);
   }
 
 }

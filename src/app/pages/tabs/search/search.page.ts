@@ -6,11 +6,14 @@ import { Component, OnInit, ViewChild } from '@angular/core';
   styleUrls: ['./search.page.scss'],
 })
 export class SearchPage implements OnInit {
+
   @ViewChild('searchInput') sInput;
   model: any = {
     icon: 'search-outline',
     title: 'No Restaurants Record Found'
   };
+  isLoading: boolean;
+  query: any;
   allRestaurants: any[] = [
     {
       uid: '12wefdss',
@@ -26,7 +29,7 @@ export class SearchPage implements OnInit {
       price: 100
     },
     {
-      uid: '12wefsdsdss',
+      uid: '12wefdefsdss',
       cover: 'assets/imgs/2.jpg',
       name: 'Stayfit1',
       short_name: 'stayfit1',
@@ -39,10 +42,10 @@ export class SearchPage implements OnInit {
       price: 100
     },
     {
-      uid: '12wefsdsdsgbs',
+      uid: '12wefdssrete',
       cover: 'assets/imgs/3.jpg',
-      name: 'Stayfit3',
-      short_name: 'stayfit3',
+      name: 'Stayfit2',
+      short_name: 'stayfit2',
       cuisines: [
         'Italian',
         'Mexican'
@@ -50,11 +53,11 @@ export class SearchPage implements OnInit {
       rating: 5,
       delivery_time: 25,
       price: 100
-    }
+    },
   ];
+
   restaurants: any[] = [];
-  query: any;
-  isLoading: boolean = false;
+
   constructor() { }
 
   ngOnInit() {
@@ -64,23 +67,19 @@ export class SearchPage implements OnInit {
   }
 
   async onSearchChange(event) {
+    console.log(event.detail.value);
     this.query = event.detail.value.toLowerCase();
-    this.isLoading = true; // Set isLoading to true before filtering starts
-    this.restaurants = []; // Clear previous search results
-
-    if (this.query.length > 0) {
-      setTimeout(() => {
-        // Simulating an asynchronous operation with setTimeout
-        this.restaurants = this.allRestaurants.filter((element) => {
+    this.restaurants = [];
+    if(this.query.length > 0) {
+      this.isLoading = true;
+      setTimeout(async() => {
+        this.restaurants = await this.allRestaurants.filter((element: any) => {
           return element.short_name.includes(this.query);
         });
-
-        this.isLoading = false; // Set isLoading to false after filtering is complete
-      }, 3000); // Simulated delay of 3 seconds
-    } else {
-      this.isLoading = false; // If query is empty, set isLoading to false immediately
+        console.log(this.restaurants);
+        this.isLoading = false;
+      }, 3000);
     }
   }
-
 
 }
